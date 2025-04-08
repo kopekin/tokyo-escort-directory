@@ -1,3 +1,15 @@
-https://yoasobi-heaven.com/ja/tokyo/A1304/robo-deli/
-https://yoasobi-heaven.com/ja/tokyo/A1304/another-shop/
-...
+# 店舗リンクの要素を抽出（aタグに特定パターンのhref）
+for a in soup.find_all("a", href=True):
+    href = a["href"]
+    link_text = a.get_text(strip=True)
+
+    # 「Not Found」や「...」と表示されているリンクや空文字を除外
+    if link_text in ["Not Found", "..."] or link_text.strip() == "":
+        continue
+
+    # 特定のパターンでhrefをチェック
+    if href.startswith("/ja/tokyo/A1304/") and href.count("/") == 5 and "shop-list" not in href:
+        full_url = "https://yoasobi-heaven.com" + href
+
+        if full_url not in shop_urls:
+            shop_urls.append(full_url)

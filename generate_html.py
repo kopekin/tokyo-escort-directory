@@ -1,45 +1,33 @@
 import csv
 from datetime import datetime
 
-html_template = """
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>店舗一覧</title>
-    <style>
-        body {{ font-family: sans-serif; background: #f9f9f9; padding: 2rem; }}
-        table {{ width: 100%; border-collapse: collapse; background: #fff; }}
-        th, td {{ border: 1px solid #ccc; padding: 0.5rem; text-align: left; }}
-        th {{ background: #eee; }}
-    </style>
-</head>
-<body>
-    <h1>インバウンド風俗店舗データ</h1>
-    <p>更新日: {timestamp}</p>
-    <table>
-        <thead>
-            <tr><th>店名</th><th>住所</th><th>料金</th><th>電話番号</th><th>営業時間</th></tr>
-        </thead>
-        <tbody>
-            {rows}
-        </tbody>
-    </table>
-</body>
-</html>
-"""
+# CSVファイルから読み込み
+csv_file = "results.csv"
+html_file = "index.html"
 
-def generate_row(row):
-    return f"<tr><td>{row['店名']}</td><td>{row['住所']}</td><td>{row['基本料金']}</td><td>{row['電話番号']}</td><td>{row['営業時間']}</td></tr>"
+rows = []
+with open(csv_file, encoding="utf-8") as f:
+    reader = csv.reader(f)
+    headers = next(reader)
+    rows = list(reader)
 
-with open("results.csv", newline='', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
-    rows_html = "\n".join([generate_row(row) for row in reader])
+# HTML生成
+with open(html_file, "w", encoding="utf-8") as f:
+    f.write("<!DOCTYPE html>\n<html lang='ja'>\n<head>\n")
+    f.write("<meta charset='UTF-8'>\n<title>YOASOBI Heaven 収集データ</title>\n</head>\n<body>\n")
+    f.write("<h1>YOASOBI Heaven 収集データ</h1>\n")
+    f.write(f"<p>更新日時: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>\n")
+    f.write("<table border='1'>\n<tr>\n")
 
-timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-html_content = html_template.format(timestamp=timestamp, rows=rows_html)
+    for h in headers:
+        f.write(f"<th>{h}</th>")
+    f.write("</tr>\n")
 
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
+    for row in rows:
+        f.write("<tr>\n")
+        for cell in row:
+            f.write(f"<td>{cell}</td>")
+        f.write("</tr>\n")
+    f.write("</table>\n</body>\n</html>\n")
 
 print("✅ index.html を作成しました！")
